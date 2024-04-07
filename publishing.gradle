@@ -35,38 +35,6 @@ ext {
 
 allprojects {
     apply plugin: 'maven-publish'
-
-    publishing {
-        repositories {
-            maven {
-                name 'sonatype'
-                if (releaseVersion) {
-                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-                } else {
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                }
-                credentials {
-                    username sonatypeUsername
-                    password sonatypePassword
-                }
-            }
-        }
-    }
-
-    tasks.withType(PublishToMavenRepository) {
-        doFirst {
-            if (!sonatypeUsername) {
-                throw new ConfigurationException(
-                        'Please set the Sonatype username with project property "sonatype.username" ' +
-                                'or "jsonrpc4j.sonatype.username". If both are set, the latter will be effective.')
-            }
-            if (!sonatypePassword) {
-                throw new ConfigurationException(
-                        'Please set the Sonatype password with project property "sonatype.password" ' +
-                                'or "jsonrpc4j.sonatype.password". If both are set, the latter will be effective.')
-            }
-        }
-    }
 }
 
 publishing {
@@ -80,50 +48,3 @@ publishing {
 }
 
 apply from: 'pom.gradle'
-
-allprojects {
-    apply plugin: 'signing'
-
-    signing {
-        required {
-            // signing is required if this is a release version and the artifacts are to be published
-            releaseVersion && tasks.withType(PublishToMavenRepository).find {
-                gradle.taskGraph.hasTask it
-            }
-        }
-        sign publishing.publications
-    }
-}
-
-apply plugin: NexusStagingPlugin
-// remove superfluous tasks from NexusStagingPlugin
-//tasks.removeAll([promoteRepository, closeAndPromoteRepository, getStagingProfile])
-
-nexusStaging {
-    stagingProfileId sonatypeStagingProfileId
-    username sonatypeUsername
-    password sonatypePassword
-}
-
-// make sure the staging tasks are run after any publishing tasks if both are to be run
-tasks.withType(BaseStagingTask) {
-    mustRunAfter allprojects.tasks*.withType(PublishToMavenRepository)
-
-    doFirst {
-        if (!sonatypeStagingProfileId) {
-            throw new ConfigurationException(
-                    'Please set the Sonatype staging profile id with project property "sonatype.stagingProfileId" ' +
-                            'or "jsonrpc4j.sonatype.stagingProfileId". If both are set, the latter will be effective.')
-        }
-        if (!sonatypeUsername) {
-            throw new ConfigurationException(
-                    'Please set the Sonatype username with project property "sonatype.username" ' +
-                            'or "jsonrpc4j.sonatype.username". If both are set, the latter will be effective.')
-        }
-        if (!sonatypePassword) {
-            throw new ConfigurationException(
-                    'Please set the Sonatype password with project property "sonatype.password" ' +
-                            'or "jsonrpc4j.sonatype.password". If both are set, the latter will be effective.')
-        }
-    }
-}

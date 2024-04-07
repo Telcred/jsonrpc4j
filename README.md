@@ -14,7 +14,6 @@ JSON-RPC).
 ## Features Include:
   * Streaming server (`InputStream` \ `OutputStream`)
   * HTTP Server (`HttpServletRequest` \ `HttpServletResponse`)
-  * Portlet Server (`ResourceRequest` \ `ResourceResponse`)
   * Socket Server (`StreamServer`)
   * Integration with the Spring Framework (`RemoteExporter`)
   * Streaming client
