@@ -81,23 +81,6 @@ public class JsonRpcServer extends JsonRpcBasicServer {
 		);
 	}
 
-	/**
-	 * Handles a servlet request.
-	 *
-	 * @param request  the {@link jakarta.servlet.http.HttpServletRequest}
-	 * @param response the {@link jakarta.servlet.http.HttpServletResponse}
-	 * @throws IOException on error
-	 */
-	public void handle(
-		jakarta.servlet.http.HttpServletRequest request,
-		jakarta.servlet.http.HttpServletResponse response
-	) throws IOException {
-		handleCommon(
-			new JakartaHttpServletRequest(request),
-			new JakartaHttpServletResponse(response)
-		);
-	}
-
 	private void handleCommon(CommonHttpServletRequest request, CommonHttpServletResponse response) throws IOException {
 		logger.debug("Handling HttpServletRequest {}", request.unwrap());
 		response.setContentType(contentType);
@@ -193,35 +176,6 @@ public class JsonRpcServer extends JsonRpcBasicServer {
 		}
 	}
 
-	private static class JakartaHttpServletRequest implements CommonHttpServletRequest {
-
-		private final jakarta.servlet.http.HttpServletRequest request;
-
-		private JakartaHttpServletRequest(jakarta.servlet.http.HttpServletRequest request) {
-			this.request = request;
-		}
-
-		@Override
-		public Object unwrap() {
-			return this.request;
-		}
-
-		@Override
-		public InputStream getInputStream() throws IOException {
-			return this.request.getInputStream();
-		}
-
-		@Override
-		public String getMethod() {
-			return this.request.getMethod();
-		}
-
-		@Override
-		public String getParameter(String name) {
-			return this.request.getParameter(name);
-		}
-	}
-
 	private interface CommonHttpServletResponse {
 		void setContentType(String type);
 		void setStatus(int sc);
@@ -234,35 +188,6 @@ public class JsonRpcServer extends JsonRpcBasicServer {
 		private final HttpServletResponse response;
 
 		private JavaxHttpServletResponse(HttpServletResponse response) {
-			this.response = response;
-		}
-
-		@Override
-		public void setContentType(String type) {
-			this.response.setContentType(type);
-		}
-
-		@Override
-		public void setStatus(int sc) {
-			this.response.setStatus(sc);
-		}
-
-		@Override
-		public void setContentLength(int len) {
-			this.response.setContentLength(len);
-		}
-
-		@Override
-		public OutputStream getOutputStream() throws IOException {
-			return this.response.getOutputStream();
-		}
-	}
-
-	private static class JakartaHttpServletResponse implements CommonHttpServletResponse {
-
-		private final jakarta.servlet.http.HttpServletResponse response;
-
-		private JakartaHttpServletResponse(jakarta.servlet.http.HttpServletResponse response) {
 			this.response = response;
 		}
 
